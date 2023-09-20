@@ -1,0 +1,3 @@
+C:/Users/ghadi/OneDrive/Bureau/Session2/INF1015/TD2/TD2-A23-Fichiers/out/build/x64-Debug/CMakeFiles/ProjetTD2.dir
+C:/Users/ghadi/OneDrive/Bureau/Session2/INF1015/TD2/TD2-A23-Fichiers/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/ghadi/OneDrive/Bureau/Session2/INF1015/TD2/TD2-A23-Fichiers/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
