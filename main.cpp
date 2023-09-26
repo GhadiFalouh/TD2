@@ -83,7 +83,7 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 		return pDesigner;
 	}
 	
-	Designer* pDesigner = new Designer(designer);
+	//Designer* pDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
 	cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
 	return pDesigner; //TODO: Retourner le pointeur vers le designer crée.
@@ -97,8 +97,20 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 
 void changerTaille(ListeJeux& listeJeux, int nouvelleCapacite)
 {
-	//TODO : G
+	ListeJeux* nouvelleListeJeux = new ListeJeux[nouvelleCapacite];
+	int compteur = 0;
+	for (Jeu* jeu : spanListeJeux(listeJeux))	
+	{		
+		(*nouvelleListeJeux).elements[compteur] = jeu;		
+		compteur++;
+	}
+	for (int i =0; i < listeJeux.capacite; i++)
+	{
+		delete listeJeux.elements[i];
+	}
+	
 }
+
 
 //TODO: Fonction pour ajouter un Jeu à ListeJeux.
 // Le jeu existant déjà en mémoire, on veut uniquement ajouter le pointeur vers
@@ -143,11 +155,14 @@ Jeu* lireJeu(istream& fichier, ListeJeux& listeJeux)
 	
 	cout << jeu.titre << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
 	for ([[maybe_unused]] int i : iter::range(jeu.designers.nElements)) 
-	{
-		Designer* designer = lireDesigner(fichier, listeJeux);  //TODO: Mettre le designer dans la liste des designer du jeu.
-		listeDesigners->elements[i] = designer;		
+	{		
+		cout << listeDesigners->elements[i] << endl;
+		Designer* designer = lireDesigner(fichier, listeJeux);  //TODO: Mettre le designer dans la liste des designer du jeu.		
+		listeDesigners->elements[i]= designer;				
+
 		//TODO: Ajouter le jeu à la liste des jeux auquel a participé le designer.
-		//designer->listeJeuxParticipes
+		designer->listeJeuxParticipes.elements[designer->listeJeuxParticipes.nElements]; //G
+		
 	}
 	return pJeu; //TODO: Retourner le pointeur vers le nouveau jeu.
 }
