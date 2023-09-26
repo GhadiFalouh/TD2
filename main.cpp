@@ -149,19 +149,24 @@ Jeu* lireJeu(istream& fichier, ListeJeux& listeJeux)
 	// que contient un jeu. Servez-vous de votre fonction d'ajout de jeu car la
 	// liste de jeux participé est une ListeJeu. Afficher un message lorsque
 	// l'allocation du jeu est réussie.
-	ListeDesigners* listeDesigners = new ListeDesigners[jeu.designers.nElements];
-	jeu.designers = *listeDesigners; 
+	ListeDesigners* listeDesigners = new ListeDesigners;
+	listeDesigners->elements = new Designer * [jeu.designers.nElements];
+	listeDesigners->nElements = jeu.designers.nElements;
+	jeu.designers = *listeDesigners;
+
 	Jeu* pJeu = new Jeu(jeu);
+	//*pJeu = jeu;
 	
 	cout << jeu.titre << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
 	for ([[maybe_unused]] int i : iter::range(jeu.designers.nElements)) 
-	{		
-		cout << listeDesigners->elements[i] << endl;
+	{				
 		Designer* designer = lireDesigner(fichier, listeJeux);  //TODO: Mettre le designer dans la liste des designer du jeu.		
 		listeDesigners->elements[i]= designer;				
 
 		//TODO: Ajouter le jeu à la liste des jeux auquel a participé le designer.
-		designer->listeJeuxParticipes.elements[designer->listeJeuxParticipes.nElements]; //G
+		designer->listeJeuxParticipes.elements[designer->listeJeuxParticipes.nElements + 1]; //G
+		//designer->listeJeuxParticipes.elements[designer->listeJeuxParticipes.nElements] = pJeu;
+		//designer->listeJeuxParticipes.nElements++;
 		
 	}
 	return pJeu; //TODO: Retourner le pointeur vers le nouveau jeu.
