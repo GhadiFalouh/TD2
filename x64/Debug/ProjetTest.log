@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\ghadi\OneDrive\Bureau\Session2\INF1015\TD2\main.cpp(128,23): error C2660: 'lireDesigner' : la fonction ne prend pas 1 arguments
+C:\Users\ghadi\OneDrive\Bureau\Session2\INF1015\TD2\main.cpp(65,11): message : voir la déclaration de 'lireDesigner'

@@ -46,9 +46,23 @@ gsl::span<Designer*> spanListeDesigners(const ListeDesigners& liste)
 //TODO: Fonction qui cherche un designer par son nom dans une ListeJeux.
 // Cette fonction renvoie le pointeur vers le designer si elle le trouve dans
 // un des jeux de la ListeJeux. En cas contraire, elle renvoie un pointeur nul.
+Designer* trouverDesigner(const ListeJeux& listeJeux, string nom)
+{
+	for (const Jeu* jeu : spanListeJeux(listeJeux))
+	{
+		for (Designer* designer : spanListeDesigners(jeu->designers))
+		{
+			if (designer->nom == nom)
+			{
+				return designer;
+			}
+		}
+	}
+	return nullptr;
+}
 
 
-Designer* lireDesigner(istream& fichier)
+Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 {
 	Designer designer = {}; // On initialise une structure vide de type Designer.
 	designer.nom = lireString(fichier);
@@ -62,9 +76,17 @@ Designer* lireDesigner(istream& fichier)
 	// on va avoir des doublons car plusieurs jeux ont des designers en commun
 	// dans le fichier binaire. Pour ce faire, cette fonction aura besoin de
 	// la liste de jeux principale en paramètre.
+	
+	Designer* pDesigner = trouverDesigner(listeJeux, designer.nom);
+	if (pDesigner != nullptr)
+	{
+		return pDesigner;
+	}
+	
+	Designer* nouveauDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
 	cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
-	return {}; //TODO: Retourner le pointeur vers le designer crée.
+	return nouveauDesigner; //TODO: Retourner le pointeur vers le designer crée.
 }
 
 //TODO: Fonction qui change la taille du tableau de jeux de ListeJeux.
