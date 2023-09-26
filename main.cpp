@@ -46,7 +46,7 @@ gsl::span<Designer*> spanListeDesigners(const ListeDesigners& liste)
 //TODO: Fonction qui cherche un designer par son nom dans une ListeJeux.
 // Cette fonction renvoie le pointeur vers le designer si elle le trouve dans
 // un des jeux de la ListeJeux. En cas contraire, elle renvoie un pointeur nul.
-Designer* trouverDesigner(const ListeJeux& listeJeux, string nom)
+Designer* ChercherDesigner(const ListeJeux& listeJeux, string nom)
 {
 	for (const Jeu* jeu : spanListeJeux(listeJeux))
 	{
@@ -77,16 +77,16 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 	// dans le fichier binaire. Pour ce faire, cette fonction aura besoin de
 	// la liste de jeux principale en paramètre.
 	
-	Designer* pDesigner = trouverDesigner(listeJeux, designer.nom);
+	Designer* pDesigner = ChercherDesigner(listeJeux, designer.nom);
 	if (pDesigner != nullptr)
 	{
 		return pDesigner;
 	}
 	
-	Designer* nouveauDesigner = new Designer(designer);
+	Designer* pDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
 	cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
-	return nouveauDesigner; //TODO: Retourner le pointeur vers le designer crée.
+	return pDesigner; //TODO: Retourner le pointeur vers le designer crée.
 }
 
 //TODO: Fonction qui change la taille du tableau de jeux de ListeJeux.
@@ -95,11 +95,25 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 // avait dans l'ancien, et éliminer l'ancien trop petit. N'oubliez pas, on copie
 // des pointeurs de jeux. Il n'y a donc aucune nouvelle allocation de jeu ici !
 
+void changerTaille(ListeJeux& listeJeux, int nouvelleCapacite)
+{
+	//TODO : G
+}
+
 //TODO: Fonction pour ajouter un Jeu à ListeJeux.
 // Le jeu existant déjà en mémoire, on veut uniquement ajouter le pointeur vers
 // le jeu existant. De plus, en cas de saturation du tableau elements, cette
 // fonction doit doubler la taille du tableau elements de ListeJeux.
 // Utilisez la fonction pour changer la taille du tableau écrite plus haut.
+void ajouterJeu(ListeJeux& listeJeux, Jeu* jeu) // G
+{
+	if (listeJeux.capacite == listeJeux.nElements)
+	{
+		int nouvelleCapacite = 2 * listeJeux.capacite;
+		changerTaille(listeJeux, nouvelleCapacite);
+	}
+	listeJeux.elements[listeJeux.nElements] = jeu;
+}
 
 //TODO: Fonction qui enlève un jeu de ListeJeux.
 // Attention, ici il n'a pas de désallocation de mémoire. Elle enlève le
@@ -108,7 +122,7 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 // jeu à être retiré par celui présent en fin de liste et décrémenter la taille
 // de celle-ci.
 
-Jeu* lireJeu(istream& fichier)
+Jeu* lireJeu(istream& fichier, ListeJeux& listeJeux)
 {
 	Jeu jeu = {}; // On initialise une structure vide de type Jeu
 	jeu.titre = lireString(fichier);
@@ -123,12 +137,19 @@ Jeu* lireJeu(istream& fichier)
 	// que contient un jeu. Servez-vous de votre fonction d'ajout de jeu car la
 	// liste de jeux participé est une ListeJeu. Afficher un message lorsque
 	// l'allocation du jeu est réussie.
+	ListeDesigners* listeDesigners = new ListeDesigners[jeu.designers.nElements];
+	jeu.designers = *listeDesigners; 
+	Jeu* pJeu = new Jeu(jeu);
+	
 	cout << jeu.titre << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
-	for ([[maybe_unused]] int i : iter::range(jeu.designers.nElements)) {
-		lireDesigner(fichier);  //TODO: Mettre le designer dans la liste des designer du jeu.
+	for ([[maybe_unused]] int i : iter::range(jeu.designers.nElements)) 
+	{
+		Designer* designer = lireDesigner(fichier, listeJeux);  //TODO: Mettre le designer dans la liste des designer du jeu.
+		listeDesigners->elements[i] = designer;		
 		//TODO: Ajouter le jeu à la liste des jeux auquel a participé le designer.
+		//designer->listeJeuxParticipes
 	}
-	return {}; //TODO: Retourner le pointeur vers le nouveau jeu.
+	return pJeu; //TODO: Retourner le pointeur vers le nouveau jeu.
 }
 
 ListeJeux creerListeJeux(const string& nomFichier)
@@ -139,7 +160,7 @@ ListeJeux creerListeJeux(const string& nomFichier)
 	ListeJeux listeJeux = {};
 	for([[maybe_unused]] int n : iter::range(nElements))
 	{
-		lireJeu(fichier); //TODO: Ajouter le jeu à la ListeJeux.
+		lireJeu(fichier, listeJeux); //TODO: Ajouter le jeu à la ListeJeux.
 	}
 
 	return {}; //TODO: Renvoyer la ListeJeux.
@@ -184,8 +205,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 	#pragma endregion
 
 	int* fuite = new int;  // Pour vérifier que la détection de fuites fonctionne; un message devrait dire qu'il y a une fuite à cette ligne.
-
-	creerListeJeux("jeux.bin"); //TODO: Appeler correctement votre fonction de création de la liste de jeux.
+	ListeJeux listeJeux = creerListeJeux("jeux.bin"); //TODO: Appeler correctement votre fonction de création de la liste de jeux.
 
 	static const string ligneSeparation = "\n\033[35m════════════════════════════════════════\033[0m\n";
 	cout << ligneSeparation << endl;
