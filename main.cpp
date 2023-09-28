@@ -83,7 +83,7 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 	}	
 	else
 	{
-		pDesigner = new Designer();
+		pDesigner = new Designer(designer);
 	}
 	//Designer* pDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
@@ -98,18 +98,16 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 // des pointeurs de jeux. Il n'y a donc aucune nouvelle allocation de jeu ici !
 
 void changerTaille(ListeJeux& listeJeux, int nouvelleCapacite)
-{
-	ListeJeux* nouvelleListeJeux = new ListeJeux[nouvelleCapacite];
-	int compteur = 0;
-	for (Jeu* jeu : spanListeJeux(listeJeux))	
-	{		
-		(*nouvelleListeJeux).elements[compteur] = jeu;		
-		compteur++;
-	}
-	for (int i =0; i < listeJeux.capacite; i++)
+{	
+	Jeu** nouvelleListeJeux = new Jeu * [nouvelleCapacite];
+	// Copy the old elements to the new array
+	for (int i = 0; i < listeJeux.capacite; i++)
 	{
-		delete listeJeux.elements[i];
-	}
+		nouvelleListeJeux[i] = listeJeux.elements[i];
+	}	
+	delete[] listeJeux.elements;	
+	listeJeux.elements = nouvelleListeJeux;
+	listeJeux.capacite = nouvelleCapacite;
 	
 }
 
@@ -197,6 +195,7 @@ void detruireDesigner(Designer* designer)
 	delete designer;
 	designer = nullptr;
 }
+
 //TODO: Fonction qui détermine si un designer participe encore à un jeu.
 bool estParticipant(Jeu* j, Designer* d)
 {
@@ -214,6 +213,17 @@ bool estParticipant(Jeu* j, Designer* d)
 }
 
 
+void enleverJeu(ListeJeux& listeJeux, Jeu& jeu)
+{
+	for (Jeu* jeu1 : spanListeJeux(listeJeux))
+	{
+		if (jeu1 == &jeu)
+		{			
+			jeu1 = listeJeux.elements[listeJeux.nElements - 1];
+			listeJeux.nElements--;
+		}
+	}
+}
 
 //TODO: Fonction pour détruire un jeu (libération de mémoire allouée).
 // Attention, ici il faut relâcher toute les cases mémoires occupées par un jeu.
@@ -222,9 +232,30 @@ bool estParticipant(Jeu* j, Designer* d)
 // qu'un designer a participé (listeJeuxParticipes). Si le designer n'a plus de
 // jeux présents dans sa liste de jeux participés, il faut le supprimer.  Pour
 // fins de débogage, affichez le nom du jeu lors de sa destruction.
+void detruireJeu(Jeu* jeu) 
+{
+	for (Designer* designer : spanListeDesigners(jeu->designers))
+	{
+		enleverJeu(designer->listeJeuxParticipes, *jeu);
+		if (designer->listeJeuxParticipes.nElements == 0)
+		{
+			detruireDesigner(designer);
+		}		
+	}
+	cout << jeu->titre << " est detruit. " << endl; // afichage du nom de jeu detruit
+	delete[] jeu->designers.elements;
+	delete jeu;
+}
 
 //TODO: Fonction pour détruire une ListeJeux et tous ses jeux.
-////
+void detruireListeJeu(ListeJeux& listeJeu)
+{
+	for (Jeu* jeu : spanListeJeux(listeJeu))
+	{
+		detruireJeu(jeu);		
+	}
+	delete[] listeJeu.elements;
+}
 
 
 
