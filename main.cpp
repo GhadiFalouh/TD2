@@ -81,14 +81,11 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 	{
 		return pDesigner;
 	}	
-	else
-	{
-		pDesigner = new Designer(designer);
-	}
+
 	//Designer* pDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
-	cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
-	return pDesigner; //TODO: Retourner le pointeur vers le designer crée.
+	//cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
+	return new Designer(designer); //TODO: Retourner le pointeur vers le designer crée.
 }
 
 //TODO: Fonction qui change la taille du tableau de jeux de ListeJeux.
@@ -157,13 +154,13 @@ Jeu* lireJeu(istream& fichier, ListeJeux& listeJeux)
 	Jeu* pJeu = new Jeu(jeu);
 	//*pJeu = jeu;
 	
-	cout << jeu.titre << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
+	//cout << jeu.titre << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
 	for ([[maybe_unused]] int i : iter::range(jeu.designers.nElements)) 
 	{				
 		Designer* designer = lireDesigner(fichier, listeJeux);  //TODO: Mettre le designer dans la liste des designer du jeu.		
 		jeu.designers.elements[i] = designer;				
 		//TODO: Ajouter le jeu à la liste des jeux auquel a participé le designer.
-		//ajouterJeu(listeJeux, pJeu);
+		ajouterJeu(designer->listeJeuxParticipes, pJeu);
 		
 	}
 	return pJeu; //TODO: Retourner le pointeur vers le nouveau jeu.
@@ -191,25 +188,22 @@ ListeJeux creerListeJeux(const string& nomFichier)
 // Lorsqu'on détruit un designer, on affiche son nom pour fins de débogage.
 void detruireDesigner(Designer* designer)
 {
-	cout << designer->nom << endl;
+	cout << designer->nom << "est detruit. "  << endl;
 	delete designer;
 	designer = nullptr;
 }
 
 //TODO: Fonction qui détermine si un designer participe encore à un jeu.
-bool estParticipant(Jeu* j, Designer* d)
+bool estParticipant(Designer* designer)
 {
-	for (Designer* designer : spanListeDesigners(j->designers))
+	if (designer->listeJeuxParticipes.nElements == 0)
 	{
-		for (const Jeu* jeu : spanListeJeux(designer->listeJeuxParticipes))
-		{
-			if (j == jeu)
-			{
-				return true;
-			}
-		}
+		return false;
 	}
-	return false;
+	else
+	{
+		return true;
+	}
 }
 
 
@@ -235,9 +229,9 @@ void enleverJeu(ListeJeux& listeJeux, Jeu& jeu)
 void detruireJeu(Jeu* jeu) 
 {
 	for (Designer* designer : spanListeDesigners(jeu->designers))
-	{
+	{			
 		enleverJeu(designer->listeJeuxParticipes, *jeu);
-		if (designer->listeJeuxParticipes.nElements == 0)
+		if (!estParticipant(designer))
 		{
 			detruireDesigner(designer);
 		}		
@@ -282,11 +276,15 @@ void afficherJeu(const Jeu& j)
 // Servez-vous de la fonction d'affichage d'un jeu crée ci-dessus. Votre ligne
 // de séparation doit être différent de celle utilisée dans le main.
 void afficherListeJeux(const ListeJeux& listeJeux)
-{	
+{		
+	int indice = 1;
 	for (const Jeu* jeu : spanListeJeux(listeJeux))
-	{
+	{					
+		cout << "Jeu " << indice <<" :" << endl;
 		afficherJeu(*jeu);
+		indice++;
 	}
+	cout << endl;
 }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
@@ -305,7 +303,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 	cout << ligneSeparation << endl;
 	cout << "Premier jeu de la liste :" << endl;
 	//TODO: Afficher le premier jeu de la liste (en utilisant la fonction).  Devrait être Chrono Trigger.
-
+	afficherJeu(*listeJeux.elements[0]);
 	cout << ligneSeparation << endl;
 
 	//TODO: Appel à votre fonction d'affichage de votre liste de jeux.	
@@ -313,5 +311,5 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 	//TODO: Faire les appels à toutes vos fonctions/méthodes pour voir qu'elles fonctionnent et avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
 
 	//TODO: Détruire tout avant de terminer le programme.  Devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
-	
+	detruireListeJeu(listeJeux);
 }
