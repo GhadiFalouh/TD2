@@ -81,6 +81,10 @@ Designer* lireDesigner(istream& fichier, ListeJeux& listeJeux)
 	{
 		return pDesigner;
 	}	
+	else
+	{
+		pDesigner = new Designer();
+	}
 	//Designer* pDesigner = new Designer(designer);
 	// Afficher un message lorsque l'allocation du designer est réussie.
 	cout << designer.nom << endl;  //TODO: Enlever cet affichage temporaire servant à voir que le code fourni lit bien les jeux.
